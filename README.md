@@ -7,6 +7,7 @@
 [npm]: https://www.npmjs.org/package/history
 
 [`history`](https://www.npmjs.com/package/history) is a JavaScript library that lets you easily manage session history anywhere JavaScript runs. `history` abstracts away the differences in various environments and provides a minimal API that lets you manage the history stack, navigate, confirm navigation, and persist state between sessions.
+history 提供 mini API 方便轻松管理 history statck 和 sessions 间状态。
 
 ## Installation
 
