@@ -2,14 +2,25 @@ import resolvePathname from 'resolve-pathname'
 import valueEqual from 'value-equal'
 import { parsePath } from './PathUtils'
 
+/**
+ * 创建新的 location
+ * @param  {string} path            path
+ * @param  {object} state           state
+ * @param  {string} key             key
+ * @param  {object} currentLocation currentLocation
+ * @return {object}                 location
+ */
 export const createLocation = (path, state, key, currentLocation) => {
   let location
   if (typeof path === 'string') {
     // Two-arg form: push(path, state)
+    // 如果 path 是字符串，则调用 parsePath 方法分析 path，返回 location 对象
     location = parsePath(path)
+    // 为新的 location 对象添加 state 属性
     location.state = state
   } else {
     // One-arg form: push(location)
+    // path 为对象时，处理对象中的 pathname、search、hash、state 值
     location = { ...path }
 
     if (location.pathname === undefined)
@@ -66,9 +77,12 @@ export const createLocation = (path, state, key, currentLocation) => {
   return location
 }
 
+// 判断两个 location 是否相等
 export const locationsAreEqual = (a, b) =>
   a.pathname === b.pathname &&
   a.search === b.search &&
   a.hash === b.hash &&
   a.key === b.key &&
+  // 判断两值是否全等
+  // 参考 https://github.com/mjackson/value-equal
   valueEqual(a.state, b.state)

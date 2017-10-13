@@ -1,3 +1,4 @@
+// 导出接口
 export createBrowserHistory from './createBrowserHistory'
 export createHashHistory from './createHashHistory'
 export createMemoryHistory from './createMemoryHistory'
