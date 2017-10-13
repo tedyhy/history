@@ -7,7 +7,7 @@ import { parsePath } from './PathUtils'
  * @param  {string} path            path
  * @param  {object} state           state
  * @param  {string} key             key
- * @param  {object} currentLocation currentLocation
+ * @param  {object} currentLocation 当前封装好的 history.location 对象
  * @return {object}                 location
  */
 export const createLocation = (path, state, key, currentLocation) => {

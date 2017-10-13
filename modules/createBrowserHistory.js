@@ -19,9 +19,10 @@ import {
   isExtraneousPopstateEvent
 } from './DOMUtils'
 
-const PopStateEvent = 'popstate'
-const HashChangeEvent = 'hashchange'
+const PopStateEvent = 'popstate' // 定义 popstate 事件名称
+const HashChangeEvent = 'hashchange' // 定义 hashchange 事件名称
 
+// 获取window.history.state 对象
 const getHistoryState = () => {
   try {
     return window.history.state || {}
@@ -35,52 +36,75 @@ const getHistoryState = () => {
 /**
  * Creates a history object that uses the HTML5 history API including
  * pushState, replaceState, and the popstate event.
+ * 
+ * 使用 HTML5 history API 创建一个 history 对象，包括：pushState、replaceState、popstate event
+ * 如：
+ * createBrowserHistory({
+ *   basename: '',             // The base URL of the app (see below)
+ *   forceRefresh: false,      // Set true to force full page refreshes
+ *   keyLength: 6,             // The length of location.key
+ *   // A function to use to confirm navigation with the user (see below)
+ *   getUserConfirmation: (message, callback) => callback(window.confirm(message))
+ * })
  */
 const createBrowserHistory = (props = {}) => {
+  // 如果不是 DOM 环境，则抛出错误“浏览器 history 需要 DOM 环境”
   invariant(
     canUseDOM,
     'Browser history needs a DOM'
   )
 
+  // 浏览器真实 history 对象，即：window.history
   const globalHistory = window.history
+  // 判断浏览器是否支持 history
   const canUseHistory = supportsHistory()
+  // 判断 popstate 事件是否依赖 hashChange 事件监听
   const needsHashChangeListener = !supportsPopStateOnHashChange()
 
   const {
-    forceRefresh = false,
+    forceRefresh = false, // 是否强制刷新整个页面，默认为 false
     getUserConfirmation = getConfirmation,
-    keyLength = 6
+    keyLength = 6 // location.key 的长度
   } = props
+  // 处理 props.basename，生成最终的 basename，默认为空字符串
   const basename = props.basename ? stripTrailingSlash(addLeadingSlash(props.basename)) : ''
 
+  // 根据 historyState 生成新的 location 对象
   const getDOMLocation = (historyState) => {
     const { key, state } = (historyState || {})
     const { pathname, search, hash } = window.location
 
     let path = pathname + search + hash
 
+    // 如果 basename 不存在，或者路径 path 不以 basename 开头，则发出警告
     warning(
       (!basename || hasBasename(path, basename)),
       'You are attempting to use a basename on a page whose URL path does not begin ' +
       'with the basename. Expected path "' + path + '" to begin with "' + basename + '".'
     )
 
+    // 如果有 basename，则从路径 path 里去除 basename，用最终的 path 创建新的 location 对象
     if (basename)
       path = stripBasename(path, basename)
 
     return createLocation(path, state, key)
   }
 
+  // 随机生成长度为 keyLength 的字符串
   const createKey = () =>
     Math.random().toString(36).substr(2, keyLength)
 
+  // 创建 transitionManager 对象
   const transitionManager = createTransitionManager()
 
+  // 同步 history 对象
   const setState = (nextState) => {
     Object.assign(history, nextState)
 
+    // 同步 history 长度
     history.length = globalHistory.length
 
+    // 通知监听器 history.location 和 history.action 发生变化
     transitionManager.notifyListeners(
       history.location,
       history.action
@@ -89,6 +113,7 @@ const createBrowserHistory = (props = {}) => {
 
   const handlePopState = (event) => {
     // Ignore extraneous popstate events in WebKit.
+    // 如果是外来的 popstate 事件，则忽略之
     if (isExtraneousPopstateEvent(event))
       return 
 
@@ -147,7 +172,9 @@ const createBrowserHistory = (props = {}) => {
   let allKeys = [ initialLocation.key ]
 
   // Public interface
+  // 下面定义公共接口
 
+  // 根据 location 拼接生成新的 path
   const createHref = (location) =>
     basename + createPath(location)
 
@@ -169,6 +196,7 @@ const createBrowserHistory = (props = {}) => {
       const { key, state } = location
 
       if (canUseHistory) {
+        // 参考 https://developer.mozilla.org/zh-CN/docs/Web/API/History/pushState
         globalHistory.pushState({ key, state }, null, href)
 
         if (forceRefresh) {
@@ -234,13 +262,16 @@ const createBrowserHistory = (props = {}) => {
     })
   }
 
+  // 封装 history.go 方法，调用 window.history.go()
   const go = (n) => {
     globalHistory.go(n)
   }
 
+  // goBack 方法，类似 window.history.back()
   const goBack = () =>
     go(-1)
 
+  // goForward 方法，类似 window.history.forward()
   const goForward = () =>
     go(1)
 
@@ -292,6 +323,7 @@ const createBrowserHistory = (props = {}) => {
     }
   }
 
+  // 封装自定义 history 对象并返回
   const history = {
     length: globalHistory.length,
     action: 'POP',

@@ -10,7 +10,7 @@ export const addLeadingSlash = (path) =>
 export const stripLeadingSlash = (path) =>
   path.charAt(0) === '/' ? path.substr(1) : path
 
-// 判断是否有 basename
+// 判断是否以给定的 basename 开头
 export const hasBasename = (path, prefix) => 
   (new RegExp('^' + prefix + '(\\/|\\?|#|$)', 'i')).test(path)
 

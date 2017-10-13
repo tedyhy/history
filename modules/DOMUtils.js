@@ -28,6 +28,7 @@ export const getConfirmation = (message, callback) =>
  * changed to avoid false negatives for Windows Phones: https://github.com/reactjs/react-router/issues/586
  */
 // 通过 ua 判断哪些浏览器支持 window.history
+// 参考 http://caniuse.com/#feat=history
 export const supportsHistory = () => {
   const ua = window.navigator.userAgent
 
@@ -61,7 +62,7 @@ export const supportsGoWithoutReloadUsingHash = () =>
  * Accounts for the fact that Chrome on iOS fires real popstate events
  * containing undefined state when pressing the back button.
  */
-// popstate event.state 未定义情况
+// 通过 popstate 的 event.state 未定义情况判断是否是外来的 popstate 事件
 export const isExtraneousPopstateEvent = event =>
   event.state === undefined &&
   navigator.userAgent.indexOf('CriOS') === -1
