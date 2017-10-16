@@ -179,16 +179,19 @@ const createBrowserHistory = (props = {}) => {
     basename + createPath(location)
 
   const push = (path, state) => {
+    // 如果 path 不是对象，或者 path.state 未定义，或者 state 未定义，则抛出警告
     warning(
       !(typeof path === 'object' && path.state !== undefined && state !== undefined),
       'You should avoid providing a 2nd state argument to push when the 1st ' +
       'argument is a location-like object that already has state; it is ignored'
     )
 
+    // 根据 path、state 创建新的 location
     const action = 'PUSH'
     const location = createLocation(path, state, createKey(), history.location)
 
     transitionManager.confirmTransitionTo(location, action, getUserConfirmation, (ok) => {
+      // 如果 getUserConfirmation 返回值为 false，则阻止 location 跳转
       if (!ok)
         return
 
@@ -199,6 +202,7 @@ const createBrowserHistory = (props = {}) => {
         // 参考 https://developer.mozilla.org/zh-CN/docs/Web/API/History/pushState
         globalHistory.pushState({ key, state }, null, href)
 
+        // 强制刷新整个页面
         if (forceRefresh) {
           window.location.href = href
         } else {
@@ -211,6 +215,7 @@ const createBrowserHistory = (props = {}) => {
           setState({ action, location })
         }
       } else {
+        // 如果不支持 window.history，则发出警告并通过 location.href 跳转
         warning(
           state === undefined,
           'Browser history cannot push state in browsers that do not support HTML5 history'
@@ -241,6 +246,7 @@ const createBrowserHistory = (props = {}) => {
       if (canUseHistory) {
         globalHistory.replaceState({ key, state }, null, href)
 
+        // 强制刷新整个页面
         if (forceRefresh) {
           window.location.replace(href)
         } else {
@@ -313,6 +319,7 @@ const createBrowserHistory = (props = {}) => {
     }
   }
 
+  // listen 监听器，返回值为解绑监听器回调
   const listen = (listener) => {
     const unlisten = transitionManager.appendListener(listener)
     checkDOMListeners(1)

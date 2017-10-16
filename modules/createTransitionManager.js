@@ -1,5 +1,6 @@
 import warning from 'warning'
 
+// 用于创建 transition 对象管理器
 const createTransitionManager = () => {
   let prompt = null
 
@@ -33,6 +34,8 @@ const createTransitionManager = () => {
         if (typeof getUserConfirmation === 'function') {
           getUserConfirmation(result, callback)
         } else {
+          // getUserConfirmation 函数不存在时，抛出警告信息
+          // getUserConfirmation 函数必选
           warning(
             false,
             'A history needs a getUserConfirmation function in order to use a prompt message'
@@ -51,6 +54,8 @@ const createTransitionManager = () => {
 
   let listeners = []
 
+  // 添加监听器
+  // 如：const unlisten = transitionManager.appendListener(listener)
   const appendListener = (fn) => {
     let isActive = true
 
@@ -61,12 +66,14 @@ const createTransitionManager = () => {
 
     listeners.push(listener)
 
+    // 解除监听器回调
     return () => {
       isActive = false
       listeners = listeners.filter(item => item !== listener)
     }
   }
 
+  // 通知监听器
   const notifyListeners = (...args) => {
     listeners.forEach(listener => listener(...args))
   }
